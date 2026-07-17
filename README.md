@@ -37,9 +37,9 @@ El 70 % de la recaudación se destina a premios: la suma de `count × prize` de 
 
 - una terminación de 4 cifras cobra también la de 3, la de 2 y el reintegro (75 + 15 + 6 + 3 €);
 - los reintegros especiales se suman al ordinario y entre sí si coinciden las cifras;
-- la pedrea se genera **sin colisiones** dentro de cada tamaño ni con las terminaciones del 1er y 2º premio (las colisiones raras se resuelven regenerando la combinación).
+- las extracciones de pedrea son independientes y **pueden repetirse** entre sí, igual que en el sorteo real (en el sorteo del 16/07/26 el 150 salió dos veces en la pedrea de 3 cifras y el 64 dos veces en la de 2). Una terminación extraída *k* veces paga *k* veces a quien la lleva. Sí se excluyen las terminaciones del 1er/2º premio, que ya se pagan en su propia categoría.
 
-Con esto, cada categoría reclama exactamente su `count` nominal en cualquier sorteo y el pago total por serie es siempre 210.000 € (hay un test que puntúa la serie completa y lo comprueba). A efectos de **conteo e informe**, cada número aparece solo en su categoría más específica (`scoreTicket` devuelve esa categoría): una terminación de 4 cifras nunca se cuenta también como terminación de 3.
+Con esto, el pago total por serie es **siempre exactamente 210.000 €** (cada tamaño de pedrea tiene un nº fijo de extracciones y cada una reparte su importe completo; una repetición concentra el dinero en menos números distintos, pero no cambia el total). Un test recorre la serie completa y verifica que cada categoría paga `count × prize` y el total 210.000 €. A efectos de **conteo e informe**, cada número aparece solo en su categoría más específica (`scoreTicket` devuelve esa categoría): una terminación de 4 cifras nunca se cuenta también como terminación de 3.
 
 > Nota de diseño: si en lugar de acumular se pagara únicamente la categoría más específica, el retorno del sistema quedaría estructuralmente por debajo del 70 % (≈64–66 %), rompiendo la propiedad matemática que este dashboard quiere ilustrar. Por eso el motor acumula conceptos compatibles.
 
@@ -60,7 +60,7 @@ Para la cartera activa:
 
 - (a) que las categorías suman 41.050 números premiados por serie —tanto en la tabla como contando los 100.000 números de una serie en sorteos generados—;
 - (b) que el valor esperado simulado converge a ~70 % del coste al aumentar las iteraciones, y que el pago a una serie completa es **exactamente** 210.000 € en todos los sorteos;
-- la coherencia de `generateDraw` (pedrea sin colisiones), los casos de `scoreTicket`, la probabilidad exacta frente a Monte Carlo y el cumplimiento del suelo garantizado.
+- la coherencia de `generateDraw` (nº fijo de extracciones de pedrea, repeticiones permitidas, pago doble de una terminación repetida), los casos de `scoreTicket`, la probabilidad exacta frente a Monte Carlo y el cumplimiento del suelo garantizado.
 
 ## Estructura
 

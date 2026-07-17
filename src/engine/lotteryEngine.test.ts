@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { DRAW_CONFIGS, PAYOUT_RATIO, PRIZE_CATEGORIES } from './config'
+import { CATEGORY_BY_ID, DRAW_CONFIGS, PAYOUT_RATIO, PRIZE_CATEGORIES } from './config'
 import {
   generateDraw,
   lastKStr,
@@ -33,13 +33,15 @@ describe('PRIZE_CATEGORIES', () => {
 describe('generateDraw', () => {
   const rng = createRng(42)
 
-  it('genera sorteos coherentes y sin colisiones en la pedrea', () => {
+  it('genera el nº correcto de extracciones de pedrea, sin coincidir con las terminaciones premiadas', () => {
     for (let i = 0; i < 200; i++) {
       const draw = generateDraw(rng)
       expect(draw.segundo).not.toBe(draw.primer)
-      expect(new Set(draw.pedrea4).size).toBe(4)
-      expect(new Set(draw.pedrea3).size).toBe(7)
-      expect(new Set(draw.pedrea2).size).toBe(9)
+      // Número de extracciones fijo (pueden repetirse entre sí, como en la realidad)
+      expect(draw.pedrea4).toHaveLength(4)
+      expect(draw.pedrea3).toHaveLength(7)
+      expect(draw.pedrea2).toHaveLength(9)
+      // Pero nunca la terminación del 1er/2º premio (esa va en su propia categoría)
       expect(draw.pedrea4).not.toContain(lastKStr(draw.primer, 4))
       expect(draw.pedrea4).not.toContain(lastKStr(draw.segundo, 4))
       expect(draw.pedrea3).not.toContain(lastKStr(draw.primer, 3))
@@ -49,28 +51,41 @@ describe('generateDraw', () => {
     }
   })
 
-  it('en cualquier sorteo, cada categoría reclama exactamente su count nominal (suma 41.050)', () => {
-    const draw = generateDraw(createRng(7))
-    const counts = new Map<string, number>()
-    for (let n = 0; n < SERIES_SIZE; n++) {
-      for (const id of matchCategories(n, draw)) {
-        counts.set(id, (counts.get(id) ?? 0) + 1)
-      }
+  it('las extracciones de pedrea pueden repetirse (como en el sorteo real)', () => {
+    // Con 9 extracciones de 2 cifras sobre ~98 terminaciones, las repeticiones
+    // ocurren en ~30 % de los sorteos: en muchas tiradas debe haber alguna.
+    const rng2 = createRng(2026)
+    let withCollision = 0
+    for (let i = 0; i < 500; i++) {
+      const draw = generateDraw(rng2)
+      if (new Set(draw.pedrea2).size < draw.pedrea2.length) withCollision++
     }
-    for (const cat of PRIZE_CATEGORIES) {
-      expect(counts.get(cat.id) ?? 0).toBe(cat.count)
-    }
-    const total = [...counts.values()].reduce((a, b) => a + b, 0)
-    expect(total).toBe(41_050)
+    expect(withCollision).toBeGreaterThan(50)
   })
 
-  it('el pago total a una serie completa es exactamente 210.000 € en todos los sorteos (EV = 70 %)', () => {
+  it('el pago total por serie es exactamente 210.000 € en todos los sorteos, con o sin colisiones', () => {
     const rng2 = createRng(123)
-    for (let i = 0; i < 5; i++) {
+    // Acumula además el importe de cada categoría (con multiplicidad de pedrea)
+    // y comprueba que iguala su valor nominal count × prize.
+    for (let i = 0; i < 6; i++) {
       const draw = generateDraw(rng2)
       let total = 0
+      const payout = new Map<string, number>()
       for (let n = 0; n < SERIES_SIZE; n++) {
-        total += scoreTicket(toNumero(n), 1, draw, JUEVES).premio
+        const { premio } = scoreTicket(toNumero(n), 1, draw, JUEVES)
+        total += premio
+        for (const id of matchCategories(n, draw)) {
+          const k = id === 'pedrea4' ? 4 : id === 'pedrea3' ? 3 : id === 'pedrea2' ? 2 : 0
+          const mult = k
+            ? draw[id as 'pedrea4' | 'pedrea3' | 'pedrea2'].filter((e) => e === lastKStr(n, k)).length
+            : 1
+          payout.set(id, (payout.get(id) ?? 0) + CATEGORY_BY_ID[id].prize * mult)
+        }
+      }
+      // Cada categoría paga exactamente count × prize, aunque el nº de números
+      // distintos premiados baje por las colisiones de pedrea.
+      for (const cat of PRIZE_CATEGORIES) {
+        expect(payout.get(cat.id) ?? 0).toBe(cat.count * cat.prize)
       }
       expect(total).toBe(210_000)
     }
@@ -135,6 +150,26 @@ describe('scoreTicket', () => {
     const r = scoreTicket('55554', 1, draw, JUEVES)
     expect(r.categoria).toBeNull()
     expect(r.premio).toBe(0)
+  })
+
+  it('una terminación de pedrea repetida paga doble', () => {
+    // Sorteo con el 30 extraído dos veces en la pedrea de 2 cifras
+    const drawColision: Draw = {
+      primer: 12345,
+      segundo: 67890,
+      pedrea4: ['1111', '2222', '3333', '4444'],
+      pedrea3: ['901', '902', '903', '904', '905', '906', '907'],
+      pedrea2: ['30', '30', '20', '40', '50', '60', '70', '80', '99'],
+      reintegroE1: '7',
+      reintegroE2: '1',
+    }
+    // 55530 termina en 30 (doble pedrea2) y en nada más → 6 € × 2 = 12 €
+    const doble = scoreTicket('55530', 1, drawColision, JUEVES)
+    expect(doble.categoria).toBe('pedrea2')
+    expect(doble.premio).toBe(12)
+    // 55520 termina en 20 (pedrea2 una sola vez) → 6 €
+    const simple = scoreTicket('55520', 1, drawColision, JUEVES)
+    expect(simple.premio).toBe(6)
   })
 })
 

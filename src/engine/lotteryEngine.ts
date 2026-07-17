@@ -12,18 +12,21 @@ export const lastKStr = (n: number, k: number) => String(lastK(n, k)).padStart(k
 export const toNumero = (n: number) => String(n).padStart(5, '0')
 
 /**
- * Genera `howMany` combinaciones de `digits` cifras finales, todas distintas
- * entre sí y sin colisionar con las terminaciones de los números premiados
- * (`banned`). Las colisiones raras se resuelven volviendo a generar.
+ * Genera `howMany` extracciones de `digits` cifras finales. Como en el
+ * sorteo real, las extracciones son independientes y **pueden repetirse**
+ * entre sí (una terminación que sale dos veces paga doble a quien la lleva).
+ * Sí se excluyen las terminaciones de los números premiados (`banned`),
+ * porque esas ya se pagan en su propia categoría (terminación del 1er/2º
+ * premio) y no deben acumular además el importe de pedrea: así el pago
+ * total por serie sigue siendo exactamente 210.000 €.
  */
 function drawEndings(rng: Rng, howMany: number, digits: number, banned: Iterable<number>): string[] {
-  const used = new Set<number>(banned)
+  const bannedSet = new Set<number>(banned)
   const result: string[] = []
   const space = 10 ** digits
   while (result.length < howMany) {
     const candidate = randInt(rng, space)
-    if (used.has(candidate)) continue
-    used.add(candidate)
+    if (bannedSet.has(candidate)) continue
     result.push(String(candidate).padStart(digits, '0'))
   }
   return result
@@ -32,10 +35,11 @@ function drawEndings(rng: Rng, howMany: number, digits: number, banned: Iterable
 /**
  * Genera un sorteo completo y coherente.
  *
- * Las combinaciones de pedrea de cada tamaño se generan sin colisiones entre
- * sí ni con la terminación correspondiente del 1er y 2º premio (si una
- * combinación coincide con la de un número premiado se vuelve a generar).
- * Los reintegros especiales son cifras independientes, sin restricción.
+ * Las extracciones de pedrea de cada tamaño son independientes y pueden
+ * repetirse entre sí (como en el sorteo real: en el ejemplo del 16/07/26 el
+ * 150 salió dos veces en la pedrea de 3 cifras y el 64 dos veces en la de 2).
+ * No coinciden con la terminación del 1er/2º premio (esas van en su propia
+ * categoría). Los reintegros especiales son cifras independientes.
  */
 export function generateDraw(rng: Rng = createRng()): Draw {
   const primer = randInt(rng, SERIES_SIZE)
@@ -56,10 +60,11 @@ export function generateDraw(rng: Rng = createRng()): Draw {
 const mod = (n: number, m: number) => ((n % m) + m) % m
 
 /**
- * Devuelve todas las categorías que corresponden al número `n` en el sorteo
- * `draw`, según la definición nominal de cada una (las de la tabla
- * PRIZE_CATEGORIES). Cada categoría reclama exactamente su `count` nominal
- * de números por serie, para cualquier sorteo.
+ * Devuelve las categorías (una vez cada una) que corresponden al número `n`.
+ * Para las categorías de pedrea sólo informa de la pertenencia; la
+ * multiplicidad (una terminación repetida paga varias veces) la aplica quien
+ * calcula el premio, contando cuántas veces aparece la terminación en el
+ * sorteo.
  */
 export function matchCategories(n: number, draw: Draw): CategoryId[] {
   const { primer, segundo } = draw
@@ -106,26 +111,39 @@ const P_REINTEGROE2 = CATEGORY_BY_ID.reintegroE2.prize
 export interface DrawIndex {
   primer: number
   segundo: number
-  pedrea4: Set<number>
-  pedrea3: Set<number>
-  pedrea2: Set<number>
+  /** Terminación de pedrea → nº de veces que fue extraída (multiplicidad) */
+  pedrea4: Map<number, number>
+  pedrea3: Map<number, number>
+  pedrea2: Map<number, number>
   reintegroE1: number
   reintegroE2: number
+}
+
+/** Cuenta cuántas veces aparece cada terminación (multiplicidad de pedrea) */
+function countMap(endings: string[]): Map<number, number> {
+  const m = new Map<number, number>()
+  for (const s of endings) {
+    const n = parseInt(s, 10)
+    m.set(n, (m.get(n) ?? 0) + 1)
+  }
+  return m
 }
 
 /**
  * Índice numérico de un sorteo para puntuar carteras grandes sin las
  * asignaciones de string/array de `matchCategories` (relevante cuando se
  * simulan miles de números × decenas de miles de sorteos). Se construye una
- * vez por sorteo y se reutiliza para todas las líneas de la cartera.
+ * vez por sorteo y se reutiliza para todas las líneas de la cartera. Las
+ * pedreas se guardan como Map terminación→multiplicidad para que una
+ * terminación repetida pague varias veces.
  */
 export function prepareDrawIndex(draw: Draw): DrawIndex {
   return {
     primer: draw.primer,
     segundo: draw.segundo,
-    pedrea4: new Set(draw.pedrea4.map((s) => parseInt(s, 10))),
-    pedrea3: new Set(draw.pedrea3.map((s) => parseInt(s, 10))),
-    pedrea2: new Set(draw.pedrea2.map((s) => parseInt(s, 10))),
+    pedrea4: countMap(draw.pedrea4),
+    pedrea3: countMap(draw.pedrea3),
+    pedrea2: countMap(draw.pedrea2),
     reintegroE1: parseInt(draw.reintegroE1, 10),
     reintegroE2: parseInt(draw.reintegroE2, 10),
   }
@@ -220,22 +238,25 @@ export function scoreNumericFast(
       }
     }
   }
-  if (idx.pedrea4.has(n % 10000)) {
-    premio += P_PEDREA4
+  const c4 = idx.pedrea4.get(n % 10000)
+  if (c4 !== undefined) {
+    premio += P_PEDREA4 * c4
     if (rank > 5) {
       categoria = 'pedrea4'
       rank = 5
     }
   }
-  if (idx.pedrea3.has(n % 1000)) {
-    premio += P_PEDREA3
+  const c3 = idx.pedrea3.get(n % 1000)
+  if (c3 !== undefined) {
+    premio += P_PEDREA3 * c3
     if (rank > 9) {
       categoria = 'pedrea3'
       rank = 9
     }
   }
-  if (idx.pedrea2.has(n % 100)) {
-    premio += P_PEDREA2
+  const c2 = idx.pedrea2.get(n % 100)
+  if (c2 !== undefined) {
+    premio += P_PEDREA2 * c2
     if (rank > 11) {
       categoria = 'pedrea2'
       rank = 11
@@ -267,7 +288,8 @@ export function scoreNumericFast(
  * terminación de 4 cifras nunca se informa también como terminación de 3).
  * `premio` acumula los importes de todos los conceptos compatibles (p. ej.
  * una terminación de 4 cifras cobra también la de 3, la de 2 y el
- * reintegro; un reintegro especial se suma al ordinario si coinciden).
+ * reintegro; un reintegro especial se suma al ordinario si coinciden). Una
+ * terminación de pedrea extraída varias veces paga tantas veces como salió.
  * Esta acumulación es la que hace que el retorno del sistema sea
  * exactamente el 70 % de la recaudación en todos los sorteos.
  */
@@ -281,8 +303,21 @@ export function scoreTicket(
   const matches = matchCategories(n, draw)
   if (matches.length === 0) return { categoria: null, premio: 0 }
 
+  const pedreaMult = (endings: string[], k: number) => {
+    const t = lastKStr(n, k)
+    let c = 0
+    for (const e of endings) if (e === t) c++
+    return c
+  }
+
   let premio = 0
-  for (const id of matches) premio += CATEGORY_BY_ID[id].prize
+  for (const id of matches) {
+    let mult = 1
+    if (id === 'pedrea4') mult = pedreaMult(draw.pedrea4, 4)
+    else if (id === 'pedrea3') mult = pedreaMult(draw.pedrea3, 3)
+    else if (id === 'pedrea2') mult = pedreaMult(draw.pedrea2, 2)
+    premio += CATEGORY_BY_ID[id].prize * mult
+  }
   premio *= config.prizeMultiplier * decimos
 
   const categoria = PRIORITY_ORDER.find((id) => matches.includes(id)) ?? null

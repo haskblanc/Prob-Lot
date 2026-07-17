@@ -1,8 +1,11 @@
-# Simulador de Lotería Nacional
+# Simulador de loterías — probabilidad y valor esperado
 
-Dashboard interactivo, 100 % client-side, para simular **probabilidades, coste y ganancia potencial** al jugar a la Lotería Nacional española (sorteo ordinario del jueves, con modo alternativo del sábado).
+Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Dos pestañas:
 
-Construye distintas "carteras" de números —un número suelto, un billete entero, una serie consecutiva, números dispersos o una cartera personalizada— y compara en tiempo real su coste, probabilidad de premio, valor esperado y distribución simulada de resultados.
+- **Lotería Nacional** (sorteo ordinario del jueves, con modo del sábado): construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker).
+- **La Primitiva** (6/49): análisis exacto por combinatoria (sin Monte Carlo) del juego parimutuel con bote acumulado, incluido el **punto crítico** donde comprar todas las combinaciones tiene valor esperado positivo (la estrategia de Stefan Mandel / Cash WinFall).
+
+El contraste entre ambas es el hilo del análisis: la Lotería Nacional tiene reparto fijo (70 %, sin ventaja posible por ninguna estrategia), mientras que La Primitiva, por su bote, sí tiene un umbral matemático explotable.
 
 Sitio publicado: https://haskblanc.github.io/Prob-Lot/
 
@@ -62,6 +65,14 @@ Para la cartera activa:
 - (b) que el valor esperado simulado converge a ~70 % del coste al aumentar las iteraciones, y que el pago a una serie completa es **exactamente** 210.000 € en todos los sorteos;
 - la coherencia de `generateDraw` (nº fijo de extracciones de pedrea, repeticiones permitidas, pago doble de una terminación repetida), los casos de `scoreTicket`, la probabilidad exacta frente a Monte Carlo y el cumplimiento del suelo garantizado.
 
+`src/engine/primitiva.test.ts` verifica La Primitiva: C(49,6) = 13.983.816, los conteos combinatorios por categoría, que la suma de aportaciones al EV coincide con `singleBetEV`, y que el **bote crítico** idealizado es (1 − ratio) × coste (comprando todo, ganancia neta ~0 justo en ese bote).
+
+## La Primitiva: el "punto crítico"
+
+Mientras la Lotería Nacional reparte un porcentaje fijo (comprar toda la serie garantiza perder el 30 %), La Primitiva es **parimutuel con bote**: el EV de una apuesta se reduce a `ratio · precio + bote / N`. Sin bote recuperas en media el ratio de premios (~55 %) y **ninguna combinación tiene ventaja**. El bote es la única palanca.
+
+La estrategia de Stefan Mandel / Cash WinFall (comprar las 13.983.816 combinaciones) captura el bote de forma **determinista**: ganas seguro el gordo, toda la 5ª categoría fija (246.820 × 8 € = 1.974.560 €) y una fracción `M/N` de cada bolsa y del bote. En el caso idealizado el umbral de rentabilidad es (1 − ratio) × coste ≈ 6,3 M €; con más jugadores compartiendo, sube. Las probabilidades son combinatoria exacta (sin ruido estadístico) y los importes de premio y el bote son parámetros editables.
+
 ## Estructura
 
 ```
@@ -71,10 +82,12 @@ src/
     lotteryEngine.ts  # generateDraw, matchCategories, scoreTicket
     probability.ts # probabilidad exacta e hipergeométrica
     portfolio.ts   # constructores de carteras, coste, suelo garantizado
-    simulation.ts  # Monte Carlo
+    simulation.ts  # Monte Carlo (Lotería Nacional)
+    primitiva.ts   # La Primitiva: combinatoria exacta, EV, bote crítico
     rng.ts         # PRNG con semilla (mulberry32)
     csv.ts         # exportación
   worker/simWorker.ts   # simulación en Web Worker
   hooks/useSimulations.ts
-  components/      # UI (React + Tailwind + Recharts)
+  views/           # NacionalView, PrimitivaView (una por pestaña)
+  components/      # UI compartida (React + Tailwind + Recharts)
 ```

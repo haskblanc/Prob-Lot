@@ -4,6 +4,8 @@ Dashboard interactivo, 100 % client-side, para simular **probabilidades, coste y
 
 Construye distintas "carteras" de números —un número suelto, un billete entero, una serie consecutiva, números dispersos o una cartera personalizada— y compara en tiempo real su coste, probabilidad de premio, valor esperado y distribución simulada de resultados.
 
+Sitio publicado: https://haskblanc.github.io/Prob-Lot/
+
 ## Ejecutar
 
 ```bash

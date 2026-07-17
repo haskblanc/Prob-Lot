@@ -1,14 +1,16 @@
 # Simulador de loterías — probabilidad y valor esperado
 
-Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Tres pestañas que cubren las **tres familias estructurales** de sorteo, cada una con una respuesta distinta a "¿se puede batir al sistema?":
+Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Siete pestañas que cubren las distintas **familias estructurales** de sorteo, cada una con una respuesta distinta a "¿se puede batir al sistema?":
 
 - **Lotería Nacional** (reparto fijo): sorteo ordinario del jueves (con modo del sábado). Construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker). **Sin ventaja posible jamás**: EV fijo al 70 %; solo se gestiona la varianza.
 - **La Primitiva** (parimutuel de azar puro + bote): análisis exacto por combinatoria (6/49, sin Monte Carlo), incluido el **punto crítico** donde comprar todas las combinaciones tiene EV positivo (estrategia de Stefan Mandel / Cash WinFall). Ventaja **solo en botes extraordinarios**, impracticable.
 - **Euromillones** (parimutuel + bote con **tope y rolldown**): 5/50 + 2 estrellas (139.838.160 combinaciones), 13 categorías exactas. Modela el mecanismo que lo hace único: cuando el bote toca el tope y nadie lo gana, **baja a las categorías inferiores** (rolldown), y ahí una **apuesta corriente puede tener EV positivo** sin comprar todas las combinaciones — el edge real de Cash WinFall (Selbee/MIT). Gráfico comparando el EV accesible normal (plano) vs rolldown (creciente).
 - **La Quiniela** (parimutuel con habilidad + multitud): 14 partidos 1-X-2, distribución de aciertos exacta por convolución binomial. Es la **única familia donde una ventaja legal es teóricamente posible**, porque los resultados no son equiprobables y el premio se reparte: cuenta tu **habilidad** (aciertas mejor que la media) y tu **originalidad** (eliges resultados correctos poco populares). Incluye la **habilidad crítica** para EV positivo.
 - **El Quinigol** (misma familia que La Quiniela, objetivo más difícil): 6 partidos, aciertas el **marcador exacto** de cada equipo (0/1/2/M → 16 por partido). La predicción es mucho más rara y la multitud se amontona en marcadores típicos, así que la originalidad pesa aún más.
+- **EuroDreams** (premio fijo con **rentas / valor presente**): 6/40 + 1 Sueño. Los premios altos son anualidades (el 1er premio, 20.000 €/mes × 30 años = 7,2 M € "anunciados"). Introduce el **valor presente neto**: descontar los pagos futuros demuestra que el titular vale mucho menos hoy (≈58 % al 4 %), y que el EV real es inferior al nominal.
+- **Rascas** (lotería instantánea, **pool que se agota**): el EV de un cartón no es fijo, cambia según los premios que queden. Es el **edge de información** (caso Srivastava): si los gordos siguen sin salir tras venderse muchos cartones, los restantes tienen EV positivo. Gráfico del EV restante según lo vendido, con la ventana +EV.
 
-El contraste entre las familias es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote) a "posible con habilidad, pero rarísimo" (Quiniela/Quinigol).
+El contraste entre las familias es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote), "real y accesible en el rolldown" (Euromillones), "posible con habilidad pero rarísimo" (Quiniela/Quinigol) y el "edge de información" (Rascas). EuroDreams añade que incluso el importe del premio anunciado engaña por el calendario de pagos.
 
 Sitio publicado: https://haskblanc.github.io/Prob-Lot/
 
@@ -90,10 +92,13 @@ src/
     euromillones.ts # Euromillones: 13 categorías, rolldown, EV accesible
     quiniela.ts    # La Quiniela: distribución binomial, EV, habilidad crítica
     quinigol.ts    # El Quinigol: variante de marcador exacto (6 partidos)
+    eurodreams.ts  # EuroDreams: rentas, valor presente neto (NPV)
+    rascas.ts      # Rascas: pool que se agota, ventana de EV positivo
     rng.ts         # PRNG con semilla (mulberry32)
     csv.ts         # exportación
   worker/simWorker.ts   # simulación en Web Worker
   hooks/useSimulations.ts
-  views/           # NacionalView, PrimitivaView, EuromillonesView, QuinielaView, QuinigolView
+  views/           # una por pestaña: Nacional, Primitiva, Euromillones,
+                   # EuroDreams, Quiniela, Quinigol, Rascas
   components/      # UI compartida (React + Tailwind + Recharts)
 ```

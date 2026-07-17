@@ -4,15 +4,19 @@ import PrimitivaView from './views/PrimitivaView'
 import QuinielaView from './views/QuinielaView'
 import QuinigolView from './views/QuinigolView'
 import EuromillonesView from './views/EuromillonesView'
+import EuroDreamsView from './views/EuroDreamsView'
+import RascasView from './views/RascasView'
 
-type Tab = 'nacional' | 'primitiva' | 'euromillones' | 'quiniela' | 'quinigol'
+type Tab = 'nacional' | 'primitiva' | 'euromillones' | 'eurodreams' | 'quiniela' | 'quinigol' | 'rascas'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'nacional', label: 'Lotería Nacional' },
   { id: 'primitiva', label: 'La Primitiva' },
   { id: 'euromillones', label: 'Euromillones' },
+  { id: 'eurodreams', label: 'EuroDreams' },
   { id: 'quiniela', label: 'La Quiniela' },
   { id: 'quinigol', label: 'El Quinigol' },
+  { id: 'rascas', label: 'Rascas' },
 ]
 
 export default function App() {
@@ -23,7 +27,7 @@ export default function App() {
       <div className="border-b border-bord bg-surface">
         <div className="mx-auto max-w-7xl px-6 pt-4">
           <h1 className="text-xl font-semibold">Simulador de loterías — probabilidad y valor esperado</h1>
-          <nav className="mt-3 flex gap-1" role="tablist">
+          <nav className="mt-3 flex flex-wrap gap-1" role="tablist">
             {TABS.map((t) => (
               <button
                 key={t.id}
@@ -46,8 +50,10 @@ export default function App() {
       {tab === 'nacional' && <NacionalView />}
       {tab === 'primitiva' && <PrimitivaView />}
       {tab === 'euromillones' && <EuromillonesView />}
+      {tab === 'eurodreams' && <EuroDreamsView />}
       {tab === 'quiniela' && <QuinielaView />}
       {tab === 'quinigol' && <QuinigolView />}
+      {tab === 'rascas' && <RascasView />}
     </div>
   )
 }

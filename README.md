@@ -1,11 +1,12 @@
 # Simulador de loterías — probabilidad y valor esperado
 
-Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Dos pestañas:
+Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Tres pestañas que cubren las **tres familias estructurales** de sorteo, cada una con una respuesta distinta a "¿se puede batir al sistema?":
 
-- **Lotería Nacional** (sorteo ordinario del jueves, con modo del sábado): construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker).
-- **La Primitiva** (6/49): análisis exacto por combinatoria (sin Monte Carlo) del juego parimutuel con bote acumulado, incluido el **punto crítico** donde comprar todas las combinaciones tiene valor esperado positivo (la estrategia de Stefan Mandel / Cash WinFall).
+- **Lotería Nacional** (reparto fijo): sorteo ordinario del jueves (con modo del sábado). Construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker). **Sin ventaja posible jamás**: EV fijo al 70 %; solo se gestiona la varianza.
+- **La Primitiva** (parimutuel de azar puro + bote): análisis exacto por combinatoria (6/49, sin Monte Carlo), incluido el **punto crítico** donde comprar todas las combinaciones tiene EV positivo (estrategia de Stefan Mandel / Cash WinFall). Ventaja **solo en botes extraordinarios**, impracticable.
+- **La Quiniela** (parimutuel con habilidad + multitud): 14 partidos 1-X-2, distribución de aciertos exacta por convolución binomial. Es la **única familia donde una ventaja legal es teóricamente posible**, porque los resultados no son equiprobables y el premio se reparte: cuenta tu **habilidad** (aciertas mejor que la media) y tu **originalidad** (eliges resultados correctos poco populares). Incluye la **habilidad crítica** para EV positivo.
 
-El contraste entre ambas es el hilo del análisis: la Lotería Nacional tiene reparto fijo (70 %, sin ventaja posible por ninguna estrategia), mientras que La Primitiva, por su bote, sí tiene un umbral matemático explotable.
+El contraste entre las tres es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote) a "posible con habilidad, pero rarísimo" (Quiniela).
 
 Sitio publicado: https://haskblanc.github.io/Prob-Lot/
 
@@ -84,10 +85,11 @@ src/
     portfolio.ts   # constructores de carteras, coste, suelo garantizado
     simulation.ts  # Monte Carlo (Lotería Nacional)
     primitiva.ts   # La Primitiva: combinatoria exacta, EV, bote crítico
+    quiniela.ts    # La Quiniela: distribución binomial, EV, habilidad crítica
     rng.ts         # PRNG con semilla (mulberry32)
     csv.ts         # exportación
   worker/simWorker.ts   # simulación en Web Worker
   hooks/useSimulations.ts
-  views/           # NacionalView, PrimitivaView (una por pestaña)
+  views/           # NacionalView, PrimitivaView, QuinielaView (una por pestaña)
   components/      # UI compartida (React + Tailwind + Recharts)
 ```

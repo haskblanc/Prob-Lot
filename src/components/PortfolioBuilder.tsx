@@ -168,7 +168,7 @@ export function PortfolioBuilder({
               label="Números consecutivos"
               value={serieLen}
               min={2}
-              max={100}
+              max={1000}
               onChange={setSerieLen}
             />
             <p className="text-xs text-muted">

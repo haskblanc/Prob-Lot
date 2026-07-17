@@ -1,5 +1,5 @@
 import { PRIZE_CATEGORIES } from './config'
-import { generateDraw, scoreTicket } from './lotteryEngine'
+import { generateDraw, prepareDrawIndex, scoreNumericFast } from './lotteryEngine'
 import { portfolioCost } from './portfolio'
 import { createRng } from './rng'
 import type {
@@ -33,6 +33,12 @@ export function simulatePortfolio(
   const rng = createRng(seed)
   const cost = portfolioCost(lines, config)
 
+  // Los números y décimos se parsean una sola vez aquí, no en cada sorteo:
+  // con carteras de miles de números esto es el grueso del ahorro frente a
+  // volver a parsear/asignar en el bucle caliente de la simulación.
+  const numeros = lines.map((l) => parseInt(l.numero, 10))
+  const decimos = lines.map((l) => l.decimos)
+
   const nets = new Float64Array(iterations)
   const categoryWins = Object.fromEntries(PRIZE_CATEGORIES.map((c) => [c.id, 0])) as Record<
     CategoryId,
@@ -44,9 +50,10 @@ export function simulatePortfolio(
   const progressEvery = Math.max(1, Math.floor(iterations / 50))
   for (let i = 0; i < iterations; i++) {
     const draw = generateDraw(rng)
+    const idx = prepareDrawIndex(draw)
     let prize = 0
-    for (const line of lines) {
-      const { categoria, premio } = scoreTicket(line.numero, line.decimos, draw, config)
+    for (let j = 0; j < numeros.length; j++) {
+      const { categoria, premio } = scoreNumericFast(numeros[j], decimos[j], idx, config)
       if (categoria !== null) {
         prize += premio
         categoryWins[categoria]++

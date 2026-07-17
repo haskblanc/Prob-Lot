@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import { DRAW_CONFIGS, PAYOUT_RATIO, PRIZE_CATEGORIES } from './config'
-import { generateDraw, lastKStr, matchCategories, scoreTicket, toNumero } from './lotteryEngine'
+import {
+  generateDraw,
+  lastKStr,
+  matchCategories,
+  prepareDrawIndex,
+  scoreNumericFast,
+  scoreTicket,
+  toNumero,
+} from './lotteryEngine'
 import { detectConsecutiveRun, guaranteedFloor, portfolioCost } from './portfolio'
 import { singleNumberWinProb } from './probability'
 import { createRng } from './rng'
@@ -127,6 +135,23 @@ describe('scoreTicket', () => {
     const r = scoreTicket('55554', 1, draw, JUEVES)
     expect(r.categoria).toBeNull()
     expect(r.premio).toBe(0)
+  })
+})
+
+describe('scoreNumericFast', () => {
+  it('coincide exactamente con scoreTicket (categoría y premio) para cualquier número y sorteo', () => {
+    const rng = createRng(2026)
+    for (let d = 0; d < 20; d++) {
+      const draw = generateDraw(rng)
+      const idx = prepareDrawIndex(draw)
+      for (let t = 0; t < 500; t++) {
+        const n = Math.floor(rng() * SERIES_SIZE)
+        const decimos = 1 + Math.floor(rng() * 10)
+        const expected = scoreTicket(toNumero(n), decimos, draw, JUEVES)
+        const fast = scoreNumericFast(n, decimos, idx, JUEVES)
+        expect(fast).toEqual(expected)
+      }
+    }
   })
 })
 

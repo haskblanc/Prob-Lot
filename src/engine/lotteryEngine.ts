@@ -87,6 +87,179 @@ export function matchCategories(n: number, draw: Draw): CategoryId[] {
   return matches
 }
 
+const P_PRIMER = CATEGORY_BY_ID.primer.prize
+const P_SEGUNDO = CATEGORY_BY_ID.segundo.prize
+const P_APROX1 = CATEGORY_BY_ID.aprox1.prize
+const P_APROX2 = CATEGORY_BY_ID.aprox2.prize
+const P_CENTENA1 = CATEGORY_BY_ID.centena1.prize
+const P_CENTENA2 = CATEGORY_BY_ID.centena2.prize
+const P_TERM4 = CATEGORY_BY_ID.term4_1.prize
+const P_TERM3 = CATEGORY_BY_ID.term3_1.prize
+const P_TERM2 = CATEGORY_BY_ID.term2_1.prize
+const P_REINTEGRO1 = CATEGORY_BY_ID.reintegro1.prize
+const P_PEDREA4 = CATEGORY_BY_ID.pedrea4.prize
+const P_PEDREA3 = CATEGORY_BY_ID.pedrea3.prize
+const P_PEDREA2 = CATEGORY_BY_ID.pedrea2.prize
+const P_REINTEGROE1 = CATEGORY_BY_ID.reintegroE1.prize
+const P_REINTEGROE2 = CATEGORY_BY_ID.reintegroE2.prize
+
+export interface DrawIndex {
+  primer: number
+  segundo: number
+  pedrea4: Set<number>
+  pedrea3: Set<number>
+  pedrea2: Set<number>
+  reintegroE1: number
+  reintegroE2: number
+}
+
+/**
+ * Índice numérico de un sorteo para puntuar carteras grandes sin las
+ * asignaciones de string/array de `matchCategories` (relevante cuando se
+ * simulan miles de números × decenas de miles de sorteos). Se construye una
+ * vez por sorteo y se reutiliza para todas las líneas de la cartera.
+ */
+export function prepareDrawIndex(draw: Draw): DrawIndex {
+  return {
+    primer: draw.primer,
+    segundo: draw.segundo,
+    pedrea4: new Set(draw.pedrea4.map((s) => parseInt(s, 10))),
+    pedrea3: new Set(draw.pedrea3.map((s) => parseInt(s, 10))),
+    pedrea2: new Set(draw.pedrea2.map((s) => parseInt(s, 10))),
+    reintegroE1: parseInt(draw.reintegroE1, 10),
+    reintegroE2: parseInt(draw.reintegroE2, 10),
+  }
+}
+
+/**
+ * Equivalente numérico y sin asignaciones de `scoreTicket`, usado en el
+ * bucle caliente de la simulación Monte Carlo. Debe producir exactamente el
+ * mismo resultado que `scoreTicket(toNumero(n), decimos, draw, config)` para
+ * cualquier `n` y sorteo (verificado por test): misma categoría más
+ * específica y mismo premio acumulado.
+ */
+export function scoreNumericFast(
+  n: number,
+  decimos: number,
+  idx: DrawIndex,
+  config: DrawConfig,
+): ScoreResult {
+  const { primer, segundo } = idx
+  let premio = 0
+  let categoria: CategoryId | null = null
+  let rank = 99
+
+  if (n === primer) {
+    premio += P_PRIMER
+    categoria = 'primer'
+    rank = 0
+  }
+  if (n === segundo) {
+    premio += P_SEGUNDO
+    if (rank > 1) {
+      categoria = 'segundo'
+      rank = 1
+    }
+  }
+  if (n === mod(primer - 1, SERIES_SIZE) || n === mod(primer + 1, SERIES_SIZE)) {
+    premio += P_APROX1
+    if (rank > 2) {
+      categoria = 'aprox1'
+      rank = 2
+    }
+  }
+  if (n === mod(segundo - 1, SERIES_SIZE) || n === mod(segundo + 1, SERIES_SIZE)) {
+    premio += P_APROX2
+    if (rank > 3) {
+      categoria = 'aprox2'
+      rank = 3
+    }
+  }
+  if (Math.floor(n / 100) === Math.floor(primer / 100) && n !== primer) {
+    premio += P_CENTENA1
+    if (rank > 6) {
+      categoria = 'centena1'
+      rank = 6
+    }
+  }
+  if (Math.floor(n / 100) === Math.floor(segundo / 100) && n !== segundo) {
+    premio += P_CENTENA2
+    if (rank > 7) {
+      categoria = 'centena2'
+      rank = 7
+    }
+  }
+  const lastDigit = n % 10
+  if (n !== primer) {
+    if (n % 10000 === primer % 10000) {
+      premio += P_TERM4
+      if (rank > 4) {
+        categoria = 'term4_1'
+        rank = 4
+      }
+    }
+    if (n % 1000 === primer % 1000) {
+      premio += P_TERM3
+      if (rank > 8) {
+        categoria = 'term3_1'
+        rank = 8
+      }
+    }
+    if (n % 100 === primer % 100) {
+      premio += P_TERM2
+      if (rank > 10) {
+        categoria = 'term2_1'
+        rank = 10
+      }
+    }
+    if (lastDigit === primer % 10) {
+      premio += P_REINTEGRO1
+      if (rank > 12) {
+        categoria = 'reintegro1'
+        rank = 12
+      }
+    }
+  }
+  if (idx.pedrea4.has(n % 10000)) {
+    premio += P_PEDREA4
+    if (rank > 5) {
+      categoria = 'pedrea4'
+      rank = 5
+    }
+  }
+  if (idx.pedrea3.has(n % 1000)) {
+    premio += P_PEDREA3
+    if (rank > 9) {
+      categoria = 'pedrea3'
+      rank = 9
+    }
+  }
+  if (idx.pedrea2.has(n % 100)) {
+    premio += P_PEDREA2
+    if (rank > 11) {
+      categoria = 'pedrea2'
+      rank = 11
+    }
+  }
+  if (lastDigit === idx.reintegroE1) {
+    premio += P_REINTEGROE1
+    if (rank > 13) {
+      categoria = 'reintegroE1'
+      rank = 13
+    }
+  }
+  if (lastDigit === idx.reintegroE2) {
+    premio += P_REINTEGROE2
+    if (rank > 14) {
+      categoria = 'reintegroE2'
+      rank = 14
+    }
+  }
+
+  if (categoria === null) return { categoria: null, premio: 0 }
+  return { categoria, premio: premio * config.prizeMultiplier * decimos }
+}
+
 /**
  * Puntúa un número con `decimos` décimos en un sorteo.
  *

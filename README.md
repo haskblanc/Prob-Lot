@@ -1,6 +1,6 @@
 # Simulador de loterías — probabilidad y valor esperado
 
-Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Siete pestañas que cubren las distintas **familias estructurales** de sorteo, cada una con una respuesta distinta a "¿se puede batir al sistema?":
+Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste y ganancia potencial** de loterías españolas. Una pestaña **Resumen** de portada compara los siete sorteos lado a lado (retorno base, mecanismo y dónde está la grieta), y cada sorteo tiene su propia pestaña de análisis. Cubren las distintas **familias estructurales**, cada una con una respuesta distinta a "¿se puede batir al sistema?":
 
 - **Lotería Nacional** (reparto fijo): sorteo ordinario del jueves (con modo del sábado). Construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker). **Sin ventaja posible jamás**: EV fijo al 70 %; solo se gestiona la varianza.
 - **La Primitiva** (parimutuel de azar puro + bote): análisis exacto por combinatoria (6/49, sin Monte Carlo), incluido el **punto crítico** donde comprar todas las combinaciones tiene EV positivo (estrategia de Stefan Mandel / Cash WinFall). Ventaja **solo en botes extraordinarios**, impracticable.
@@ -98,7 +98,7 @@ src/
     csv.ts         # exportación
   worker/simWorker.ts   # simulación en Web Worker
   hooks/useSimulations.ts
-  views/           # una por pestaña: Nacional, Primitiva, Euromillones,
-                   # EuroDreams, Quiniela, Quinigol, Rascas
+  views/           # una por pestaña: Resumen (comparativa), Nacional, Primitiva,
+                   # Euromillones, EuroDreams, Quiniela, Quinigol, Rascas
   components/      # UI compartida (React + Tailwind + Recharts)
 ```

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import ResumenView from './views/ResumenView'
 import NacionalView from './views/NacionalView'
 import PrimitivaView from './views/PrimitivaView'
 import QuinielaView from './views/QuinielaView'
@@ -7,9 +8,18 @@ import EuromillonesView from './views/EuromillonesView'
 import EuroDreamsView from './views/EuroDreamsView'
 import RascasView from './views/RascasView'
 
-type Tab = 'nacional' | 'primitiva' | 'euromillones' | 'eurodreams' | 'quiniela' | 'quinigol' | 'rascas'
+type Tab =
+  | 'resumen'
+  | 'nacional'
+  | 'primitiva'
+  | 'euromillones'
+  | 'eurodreams'
+  | 'quiniela'
+  | 'quinigol'
+  | 'rascas'
 
 const TABS: { id: Tab; label: string }[] = [
+  { id: 'resumen', label: 'Resumen' },
   { id: 'nacional', label: 'Lotería Nacional' },
   { id: 'primitiva', label: 'La Primitiva' },
   { id: 'euromillones', label: 'Euromillones' },
@@ -20,7 +30,7 @@ const TABS: { id: Tab; label: string }[] = [
 ]
 
 export default function App() {
-  const [tab, setTab] = useState<Tab>('nacional')
+  const [tab, setTab] = useState<Tab>('resumen')
 
   return (
     <div className="min-h-screen bg-page text-ink">
@@ -47,6 +57,7 @@ export default function App() {
         </div>
       </div>
 
+      {tab === 'resumen' && <ResumenView onNavigate={(t) => setTab(t as Tab)} />}
       {tab === 'nacional' && <NacionalView />}
       {tab === 'primitiva' && <PrimitivaView />}
       {tab === 'euromillones' && <EuromillonesView />}

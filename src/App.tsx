@@ -12,7 +12,7 @@ import type { Portfolio } from './engine/types'
 import { fmtEur, fmtNum, fmtPct } from './format'
 import { useSimulations } from './hooks/useSimulations'
 
-const ITERATION_CHOICES = [1_000, 10_000, 100_000]
+const ITERATION_CHOICES = [10, 1_000, 10_000, 100_000]
 
 const MODE_LABELS: Record<Portfolio['mode'], string> = {
   suelto: 'Número suelto',

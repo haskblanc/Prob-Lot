@@ -2,13 +2,15 @@ import { useState } from 'react'
 import NacionalView from './views/NacionalView'
 import PrimitivaView from './views/PrimitivaView'
 import QuinielaView from './views/QuinielaView'
+import QuinigolView from './views/QuinigolView'
 
-type Tab = 'nacional' | 'primitiva' | 'quiniela'
+type Tab = 'nacional' | 'primitiva' | 'quiniela' | 'quinigol'
 
 const TABS: { id: Tab; label: string }[] = [
   { id: 'nacional', label: 'Lotería Nacional' },
   { id: 'primitiva', label: 'La Primitiva' },
   { id: 'quiniela', label: 'La Quiniela' },
+  { id: 'quinigol', label: 'El Quinigol' },
 ]
 
 export default function App() {
@@ -42,6 +44,7 @@ export default function App() {
       {tab === 'nacional' && <NacionalView />}
       {tab === 'primitiva' && <PrimitivaView />}
       {tab === 'quiniela' && <QuinielaView />}
+      {tab === 'quinigol' && <QuinigolView />}
     </div>
   )
 }

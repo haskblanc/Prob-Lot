@@ -5,8 +5,9 @@ Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste 
 - **Lotería Nacional** (reparto fijo): sorteo ordinario del jueves (con modo del sábado). Construye "carteras" de números —suelto, billete, serie consecutiva, dispersos o personalizada— y compara coste, probabilidad de premio, valor esperado y distribución simulada (Monte Carlo en Web Worker). **Sin ventaja posible jamás**: EV fijo al 70 %; solo se gestiona la varianza.
 - **La Primitiva** (parimutuel de azar puro + bote): análisis exacto por combinatoria (6/49, sin Monte Carlo), incluido el **punto crítico** donde comprar todas las combinaciones tiene EV positivo (estrategia de Stefan Mandel / Cash WinFall). Ventaja **solo en botes extraordinarios**, impracticable.
 - **La Quiniela** (parimutuel con habilidad + multitud): 14 partidos 1-X-2, distribución de aciertos exacta por convolución binomial. Es la **única familia donde una ventaja legal es teóricamente posible**, porque los resultados no son equiprobables y el premio se reparte: cuenta tu **habilidad** (aciertas mejor que la media) y tu **originalidad** (eliges resultados correctos poco populares). Incluye la **habilidad crítica** para EV positivo.
+- **El Quinigol** (misma familia que La Quiniela, objetivo más difícil): 6 partidos, aciertas el **marcador exacto** de cada equipo (0/1/2/M → 16 por partido). La predicción es mucho más rara y la multitud se amontona en marcadores típicos, así que la originalidad pesa aún más.
 
-El contraste entre las tres es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote) a "posible con habilidad, pero rarísimo" (Quiniela).
+El contraste entre las familias es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote) a "posible con habilidad, pero rarísimo" (Quiniela/Quinigol).
 
 Sitio publicado: https://haskblanc.github.io/Prob-Lot/
 
@@ -86,10 +87,11 @@ src/
     simulation.ts  # Monte Carlo (Lotería Nacional)
     primitiva.ts   # La Primitiva: combinatoria exacta, EV, bote crítico
     quiniela.ts    # La Quiniela: distribución binomial, EV, habilidad crítica
+    quinigol.ts    # El Quinigol: variante de marcador exacto (6 partidos)
     rng.ts         # PRNG con semilla (mulberry32)
     csv.ts         # exportación
   worker/simWorker.ts   # simulación en Web Worker
   hooks/useSimulations.ts
-  views/           # NacionalView, PrimitivaView, QuinielaView (una por pestaña)
+  views/           # NacionalView, PrimitivaView, QuinielaView, QuinigolView
   components/      # UI compartida (React + Tailwind + Recharts)
 ```

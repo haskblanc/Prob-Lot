@@ -13,6 +13,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   anyPrizeProb,
   breakEvenSkill,
@@ -324,6 +325,34 @@ export default function QuinigolView() {
               llevada al extremo: aún más improbable, aún más sensible a acertar lo que otros no ven.
             </p>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'si',
+                titulo: 'Modelar goles con Poisson',
+                texto:
+                  'El marcador exacto es el terreno natural de los modelos estadísticos: estimar los goles esperados de cada equipo (a partir de cuotas de mercado o métricas xG) y derivar la probabilidad de cada marcador 0/1/2/M con una distribución de Poisson supera con mucho a la intuición. Es la forma realista de llevar tu acierto del ~6 % (azar) hacia el 20 %+.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'Marcadores correctos e impopulares',
+                texto:
+                  'La multitud se amontona en 1-0, 1-1 y 2-1. Los 0-0, los M-M y los marcadores altos correctos reparten entre poquísimos acertantes. Cuando tu modelo señale probable un marcador que nadie juega, ahí está el valor — el efecto originalidad más fuerte de todo el catálogo.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'Participación baja: arma de doble filo',
+                texto:
+                  'El Quinigol mueve mucho menos dinero que la Quiniela: bolsas pequeñas (premios modestos salvo bote), pero también pocos co-acertantes y una multitud menos sofisticada. Para un jugador con modelo, un mercado pequeño y blando es más batible que uno grande y eficiente.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Jugarlo como un boleto más',
+                texto:
+                  'Sin modelo, acertar 4 de 6 marcadores exactos es rarísimo (P(algún premio) < 2 %) y tu esperanza es el retorno base. Es el juego con la barrera de entrada más alta: o se juega con método, o es de los peores tickets posibles.',
+              },
+            ]}
+          />
         </section>
       </main>
 

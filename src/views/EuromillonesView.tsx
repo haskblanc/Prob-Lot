@@ -11,6 +11,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   accessibleEV,
   anyPrizeProb,
@@ -243,6 +244,34 @@ export default function EuromillonesView() {
               </table>
             </div>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'si',
+                titulo: 'Elegir CUÁNDO jugar: la única palanca real',
+                texto:
+                  'Los números no importan (equiprobables), pero el momento sí. Con bote cerca del tope y, sobre todo, en un sorteo con rolldown anunciado, el EV accesible de una apuesta corriente puede superar el coste — el gráfico de arriba lo muestra. Es el edge de Cash WinFall: grupos como el de Jerry Selbee compraban miles de boletos solo en las semanas de rolldown, con beneficio sostenido y 100 % legal.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'Combinaciones impopulares (parimutuel)',
+                texto:
+                  'Igual que en la Primitiva: evitar fechas, patrones y secuencias no cambia tu probabilidad, pero reduce cuánta gente compartiría tu premio. En los gordos multimillonarios de Euromillones, ganar en solitario o entre dos es la diferencia más grande de todas.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Comprar todas las combinaciones',
+                texto:
+                  'C(50,5)·C(12,2) = 139.838.160 apuestas × 2,50 € = ~350 M €. Ni el capital, ni la logística de validación, ni el riesgo de compartir lo hacen viable: aquí el método Mandel es imposible. El edge accesible es el del momento (rolldown), no el del volumen.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'El bote grande atrae multitudes',
+                texto:
+                  'Cada récord de bote dispara la participación: N sube, tu fracción del rolldown baja y crece la probabilidad de compartir el 5+2. La ventana buena es el rolldown con participación moderada — no el circo mediático del bote máximo.',
+              },
+            ]}
+          />
         </section>
       </main>
 

@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   anyPrizeProb,
   DEFAULT_EURODREAMS_PARAMS,
@@ -176,6 +177,28 @@ export default function EuroDreamsView() {
               </table>
             </div>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'no',
+                titulo: 'No hay palanca de ataque',
+                texto:
+                  'Premio fijo, sin bote acumulado, sin reparto entre acertantes: como en la Lotería Nacional, ninguna elección de números, momento o volumen cambia la esperanza. El retorno ronda el 49 % en valor presente — de los peores del catálogo.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'La defensa: valorar el premio en valor presente',
+                texto:
+                  'El único "edge" aquí es informativo y defensivo: saber que los 7,2 M € del titular son ~4,2 M € reales (al 4 %). Si comparas jugar a EuroDreams frente a otro sorteo por el tamaño del premio anunciado, estás comparando peras con manzanas: convierte siempre las rentas a valor presente antes de decidir.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'La renta como protección conductual',
+                texto:
+                  'Hay un ángulo a favor del formato: buena parte de los ganadores de premios únicos dilapidan el dinero en pocos años. Una renta mensual vitalicia o larga protege contra ese riesgo. Vale menos financieramente, pero puede valer más conductualmente — un matiz honesto que el análisis puro de EV no captura.',
+              },
+            ]}
+          />
         </section>
       </main>
 

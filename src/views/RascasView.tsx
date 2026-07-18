@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   breakEvenVendidos,
   DEFAULT_RASCA_PARAMS,
@@ -190,6 +191,34 @@ export default function RascasView() {
               justo esos cartones — raro, pero real.
             </p>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'si',
+                titulo: 'El dato que vale dinero: premios pendientes',
+                texto:
+                  'Donde el operador publica los premios sin repartir por juego (varias loterías de EE. UU. y otros países lo hacen), calcular EV restante = premios pendientes ÷ cartones restantes identifica juegos +EV. Ha habido compradores sistemáticos que vivieron de esto, legalmente: es puro edge de información pública que casi nadie consulta.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'En España el dato no es público en tiempo real',
+                texto:
+                  'SELAE/ONCE no publican los premios pendientes por serie de forma continua, así que la ventana +EV existe (la matemática de arriba es real) pero no es observable: no puedes saber cuándo estás en ella. El edge queda teórico salvo que el operador cambie su transparencia.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'Series viejas frente a series recién lanzadas',
+                texto:
+                  'Un juego recién salido tiene EV = inicial (aquí, 65 %). Uno veterano es una lotería de dos capas: mejor si los gordos siguen vivos, peor si ya salieron. Sin el dato de premios pendientes, comprar cartones de series viejas es una apuesta a ciegas sobre cuál de los dos escenarios te toca.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Buscar defectos físicos o patrones en el cartón',
+                texto:
+                  'El caso Srivastava (descubrió cómo predecir rascas ganadores por los números visibles del cartón) fue un fallo de diseño que reportó al operador y se corrigió. Los rascas modernos se generan criptográficamente; y explotar un defecto de ese tipo sin reportarlo entra en terreno de fraude, no de estrategia.',
+              },
+            ]}
+          />
         </section>
       </main>
 

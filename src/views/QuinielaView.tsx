@@ -13,6 +13,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   anyPrizeProb,
   binomialPmf,
@@ -357,6 +358,34 @@ export default function QuinielaView() {
               rarísimo en la práctica.
             </p>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'si',
+                titulo: 'Usar el mercado de apuestas como estimador',
+                texto:
+                  'Las cuotas de las casas de apuestas son la mejor estimación pública de las probabilidades reales de cada partido: agregan la información de miles de apostantes profesionales. Convertir cuotas en probabilidades (1/cuota, normalizado) da un pronóstico sistemáticamente mejor que la intuición — es la vía más realista de subir tu "habilidad" por encima de la multitud.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'Ser contrarian: buscar el valor donde la multitud no está',
+                texto:
+                  'El premio se reparte: acertar lo que todos aciertan paga poco. La multitud sobre-apuesta a los favoritos y a los equipos grandes, e infra-apuesta empates y victorias visitantes. Marcar el resultado correcto e impopular (cuando las cuotas lo justifican) es la segunda palanca — y las jornadas "locas", con sorpresas, son las que dejan premios grandes a pocos acertantes.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'El peaje del ~45 % exige una ventaja enorme',
+                texto:
+                  'Con la mitad de la recaudación fuera del reparto, no basta con ser algo mejor que la media: la habilidad crítica calculada arriba muestra cuánto hay que superar a la multitud, jornada tras jornada. Los sindicatos profesionales de quinielas existieron y algunos ganaron dinero — pero son casos excepcionales, con modelos, volumen y disciplina de años.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Rellenar al azar o "por corazonadas"',
+                texto:
+                  'Sin ventaja predictiva, tu esperanza es el retorno base (~55 %): peor que la Lotería Nacional. La Quiniela sin habilidad es de los peores juegos del catálogo; con habilidad, el único con techo abierto.',
+              },
+            ]}
+          />
         </section>
       </main>
 

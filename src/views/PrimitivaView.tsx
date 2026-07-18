@@ -10,6 +10,7 @@ import {
   YAxis,
 } from 'recharts'
 import { Card, SectionTitle, StatTile } from '../components/ui'
+import { CriticalInfo } from '../components/CriticalInfo'
 import {
   breakEvenBote,
   buyAllAnalysis,
@@ -363,6 +364,34 @@ export default function PrimitivaView() {
               30 % <em>siempre</em>.
             </p>
           </Card>
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'si',
+                titulo: 'Jugar combinaciones impopulares',
+                texto:
+                  'La única mejora gratuita en un juego parimutuel. No cambia tu probabilidad de acertar (todas las combinaciones son equiprobables), pero si ganas con una combinación que poca gente juega, compartes la bolsa con menos acertantes y cobras más. En la práctica: evitar fechas (números ≤ 31), patrones visuales en el boleto, secuencias (1-2-3-4-5-6) y cifras "de la suerte". El premio esperado condicional puede multiplicarse sin coste alguno.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'Jugar solo cuando hay bote grande',
+                texto:
+                  'EV = ratio · precio + bote/N: el bote es dinero de sorteos anteriores que entra en el tuyo. Elegir el momento mejora el EV… pero ojo: los botes grandes atraen más apuestas (N sube), lo que diluye la mejora y aumenta el riesgo de compartir el gordo. Casi nunca llega a EV positivo para una apuesta.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'Comprar todas las combinaciones (Stefan Mandel)',
+                texto:
+                  'Matemáticamente correcto a partir del bote crítico (calculado arriba), y Mandel lo ejecutó legalmente en los 80-90. Hoy es inviable: rellenar y validar 13.983.816 apuestas a tiempo, movilizar ~14 M €, y el riesgo letal de que otro acertante comparta tu gordo. Las loterías además cambiaron reglas para dificultarlo.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Estadísticas de números "calientes" o "atrasados"',
+                texto:
+                  'El bombo no tiene memoria. Ningún número está "a punto de salir". Los sistemas reductores y las peñas cambian la varianza (más boletos, premios compartidos), nunca la esperanza.',
+              },
+            ]}
+          />
         </section>
       </main>
 

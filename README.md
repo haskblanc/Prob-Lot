@@ -12,6 +12,8 @@ Dashboard interactivo, 100 % client-side, para analizar **probabilidades, coste 
 
 El contraste entre las familias es el hilo del análisis: de "imposible" (reparto fijo) a "solo con azar extremo" (bote), "real y accesible en el rolldown" (Euromillones), "posible con habilidad pero rarísimo" (Quiniela/Quinigol) y el "edge de información" (Rascas). EuroDreams añade que incluso el importe del premio anunciado engaña por el calendario de pagos.
 
+Cada pestaña incluye además una sección de **"Información crítica: cómo intentar ganar"**: las estrategias reales y legales de ese juego (con veredicto FUNCIONA / MATIZ / NO FUNCIONA), incluidas las combinaciones impopulares en los parimutuel, el timing de botes y rolldowns, el uso de las cuotas del mercado como estimador en Quiniela/Quinigol, los modelos de Poisson para marcadores, el dato de premios pendientes en rascas, y el desmontaje de las falacias habituales (números "calientes", sistemas, peñas).
+
 Sitio publicado: https://haskblanc.github.io/Prob-Lot/
 
 ## Ejecutar

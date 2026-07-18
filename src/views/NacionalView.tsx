@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { CategoryTable } from '../components/CategoryTable'
 import { Comparator } from '../components/Comparator'
+import { CriticalInfo } from '../components/CriticalInfo'
 import { Histogram } from '../components/Histogram'
 import { PortfolioBuilder } from '../components/PortfolioBuilder'
 import { Card, ColorChip, SectionTitle, StatTile, colorForSlot, type UiPortfolio } from '../components/ui'
@@ -328,6 +329,41 @@ export default function NacionalView() {
           {portfolios.length >= 2 && (
             <Comparator portfolios={portfolios} results={results} config={config} />
           )}
+
+          <CriticalInfo
+            items={[
+              {
+                tipo: 'no',
+                titulo: 'Ninguna selección de números da ventaja',
+                texto:
+                  'El reparto es fijo: el 70 % de la recaudación vuelve como premios, para cualquier número, terminación o cartera. Comprar la serie entera (300.000 €) devuelve exactamente 210.000 €: perder el 30 % está garantizado por construcción. Cualquier método, peña o web que prometa ventaja estadística aquí miente — es matemáticamente imposible.',
+              },
+              {
+                tipo: 'no',
+                titulo: 'Números "calientes", rachas y sorteos anteriores',
+                texto:
+                  'El bombo no tiene memoria: cada sorteo es independiente y todos los números son equiprobables. Los historiales de resultados no contienen información explotable (falacia del jugador).',
+              },
+              {
+                tipo: 'no',
+                titulo: 'La popularidad del número da igual (a diferencia de la Primitiva)',
+                texto:
+                  'El premio por décimo es fijo y no se comparte con otros acertantes del mismo número: jugar un número "feo" o impopular no mejora nada. La estrategia de combinaciones impopulares solo funciona en juegos parimutuel.',
+              },
+              {
+                tipo: 'si',
+                titulo: 'Lo único que controlas: tu perfil de varianza',
+                texto:
+                  'Series consecutivas garantizan un suelo (1.000 números aseguran recuperar el 54 %) y acotan la pérdida máxima; los décimos dispersos suavizan resultados; el billete entero concentra el riesgo. Ninguna opción cambia la esperanza (−30 %), pero sí cuánto puedes llegar a perder en el peor caso. Es gestión de riesgo, no ventaja.',
+              },
+              {
+                tipo: 'ojo',
+                titulo: 'La única defensa real es jugar menos',
+                texto:
+                  'Con esperanza fija de −30 %, la pérdida esperada es proporcional a lo apostado. Si se juega por la ilusión, el gasto pequeño y recurrente (un décimo) minimiza el coste de esa ilusión; ningún volumen de compra la convierte en inversión.',
+              },
+            ]}
+          />
 
           {running && active && activeResult && (
             <p className="text-center text-xs text-muted">Actualizando el resto de carteras…</p>
